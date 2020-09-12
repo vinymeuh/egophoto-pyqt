@@ -22,7 +22,7 @@ from PySide2.QtGui import (
 THUMB_SIZE = 150
 
 
-class GridViewer(QListWidget):
+class ImgGridViewer(QListWidget):
 
     def __init__(self):
         QListWidget.__init__(self,
@@ -34,7 +34,7 @@ class GridViewer(QListWidget):
                              )
 
 
-class GridViewerDelegate(QStyledItemDelegate):
+class ImgGridViewerDelegate(QStyledItemDelegate):
 
     def __init__(self):
         super().__init__()
@@ -43,15 +43,15 @@ class GridViewerDelegate(QStyledItemDelegate):
         path = index.data(Qt.DisplayRole)
         rect = option.rect
 
-        imgr = QImageReader(path)
-        original_size = imgr.size()
+        img_reader = QImageReader(path)
+        original_size = img_reader.size()
         if original_size.width() >= original_size.height():
             scaled_size = QSize(THUMB_SIZE, original_size.height() * THUMB_SIZE / original_size.width())
         else:
             scaled_size = QSize(original_size.width() * THUMB_SIZE / original_size.height(), THUMB_SIZE)
 
-        imgr.setScaledSize(scaled_size)
-        img = imgr.read()
+        img_reader.setScaledSize(scaled_size)
+        img = img_reader.read()
         pixmap = QPixmap.fromImage(img)
         pixmap_rect = QRect(rect.x(), rect.y(), pixmap.size().width(), pixmap.size().height())
         painter.drawPixmap(pixmap_rect, pixmap)

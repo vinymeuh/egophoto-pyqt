@@ -20,13 +20,13 @@ from PySide2.QtWidgets import (
 )
 
 
-class CatalogBrowser(QWidget):
+class ImgDirBrowser(QWidget):
     selected = Signal(str)
 
-    def __init__(self, jpeg_path=None):
+    def __init__(self, rootpath_jpeg=None):
         QWidget.__init__(self)
 
-        self._jpeg_path = jpeg_path
+        self._rootpath_jpeg = rootpath_jpeg
         self._dirTreeView = None
         self._dirTreeModel = None
 
@@ -45,7 +45,7 @@ class CatalogBrowser(QWidget):
         self._dirTreeView.clicked.connect(self._onSelectDirectory)
 
         # select first catalog entry
-        self._dirTreeView.setRootIndex(self._dirTreeModel.index(self._jpeg_path))
+        self._dirTreeView.setRootIndex(self._dirTreeModel.index(self._rootpath_jpeg))
 
         splitter = QSplitter(Qt.Vertical)
         splitter.addWidget(button)
@@ -59,11 +59,11 @@ class CatalogBrowser(QWidget):
 
     def _onButtonClicked(self):
         year = datetime.now().year
-        year_dir = self._jpeg_path + "/" + str(year)
-        subdirs = [f.path for f in os.scandir(year_dir) if f.is_dir()]
-        if len(subdirs) > 0:
-            subdirs.sort(reverse=True)
-            dir_idx = self._dirTreeModel.index(subdirs[0])
+        year_dir = self._rootpath_jpeg + "/" + str(year)
+        dirs = [f.path for f in os.scandir(year_dir) if f.is_dir()]
+        if len(dirs) > 0:
+            dirs.sort(reverse=True)
+            dir_idx = self._dirTreeModel.index(dirs[0])
             self._dirTreeView.setCurrentIndex(dir_idx)
             self._onSelectDirectory(dir_idx)
 
