@@ -6,21 +6,27 @@ import os
 import re
 
 from PySide2.QtCore import (
-    Qt
+    Qt,
+    Signal,
 )
 from PySide2.QtWidgets import (
     QHBoxLayout,
     QSplitter,
-    QWidget
+    QWidget,
 )
 
 from egophoto.settings import app_settings
-from egophoto.widgets.img_dir_browser import ImgDirBrowser
-from egophoto.widgets.img_grid_viewer import ImgGridViewer, ImgGridViewerDelegate
-from egophoto.widgets.img_tag_viewer import ImgTagViewer
+from egophoto.widgets import (
+    ImgDirBrowser,
+    ImgGridViewer,
+    ImgGridViewerDelegate,
+    ImgTagViewer,
+)
 
 
 class GridView(QWidget):
+    directory_selected = Signal(int)
+    image_selected = Signal(str)
 
     pattern = re.compile('.*\.(jpg|jpeg)$', re.IGNORECASE)
 
@@ -52,8 +58,10 @@ class GridView(QWidget):
     def _onSelectDirectory(self, val):
         images = [val + "/" + f for f in os.listdir(val) if self.pattern.match(f)]
         images.sort()
+        self.directory_selected.emit(len(images))
 
         self._gridViewer.clear()
+        self._tagViewer.clear()
         load_start = datetime.now()
         for path in images:
             self._gridViewer.addItem(path)
@@ -66,5 +74,7 @@ class GridView(QWidget):
             path = selected[0].data(Qt.DisplayRole)
             if path != self.current_file:
                 self._tagViewer.setFile(path)
+                self.image_selected.emit(path)
         else:
             self._tagViewer.clear()
+            self.image_selected.emit("")

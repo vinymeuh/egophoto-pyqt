@@ -9,6 +9,7 @@ from PySide2.QtWidgets import (
 
 from egophoto.settings import app_settings
 from egophoto.ui.grid_view import GridView
+from egophoto.ui.statusbar import StatusBar
 
 
 class MainWindow(QMainWindow):
@@ -16,10 +17,15 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._setupStatusBar()
+        self.setStatusBar(StatusBar())
+
         self.central_widget = QStackedWidget()
-        self.central_widget.addWidget(GridView())
         self.setCentralWidget(self.central_widget)
+
+        self.grid_view = GridView()
+        self.central_widget.addWidget(self.grid_view)
+        self.grid_view.directory_selected.connect(self.statusBar().setFileCount)
+        self.grid_view.image_selected.connect(self.statusBar().setFileName)
 
         # Set window size
         app = QApplication.instance()  # don't like using qApp
@@ -29,6 +35,3 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         app_settings.save()
-
-    def _setupStatusBar(self):
-        self.statusBar()
