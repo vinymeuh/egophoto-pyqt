@@ -15,12 +15,12 @@ from egophoto.settings import app_settings
 from egophoto.widgets import (
     ImgDirBrowser,
     ImgGridViewer,
-    ImgTagViewer,
 )
 
 
 class GridView(QWidget):
-    directory_selected = Signal(int)
+    directorySelected = Signal(str)
+    imagesCount = Signal(int)
     image_selected = Signal(str)
 
     def __init__(self, parent=None):
@@ -29,15 +29,13 @@ class GridView(QWidget):
         self.current_file = None
         self.imgBrowser = ImgDirBrowser(app_settings.preferences.rootpath_jpeg)
         self.gridViewer = ImgGridViewer()
-        self.tagViewer = ImgTagViewer()
+        self.selected = None
 
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.imgBrowser)
         splitter.addWidget(self.gridViewer)
-        splitter.addWidget(self.tagViewer)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
-        splitter.setStretchFactor(2, 0)
         layout = QHBoxLayout()
         layout.addWidget(splitter)
         layout.setSpacing(0)
@@ -50,18 +48,18 @@ class GridView(QWidget):
     def _onDirectorySelected(self, val):
         if val == self.current_dir:
             return
-        self.gridViewer.fromDirectory(val)
-        self.directory_selected.emit(self.gridViewer.model.rowCount())
-        self.tagViewer.clear()
+        self.current_dir = val
+        self.gridViewer.fromDirectory(self.current_dir)
+        self.directorySelected.emit(self.current_dir)
+        self.imagesCount.emit(self.gridViewer.model.rowCount())
 
     def _onImagesSelectionChanged(self, selected, deselected):
         images = self.gridViewer.selectionModel().selectedIndexes()
-        if len(images) == 1:
-            path = images[0].data(Qt.DisplayRole)
+        self.selected = [images[i].data(Qt.DisplayRole) for i in range(len(images))]
+        if len(self.selected) == 1:
+            path = self.selected[0]
             if path != self.current_file:
-                self.tagViewer.setFile(path)
                 self.image_selected.emit(path)
                 self.current_file = path
         else:
-            self.tagViewer.clear()
             self.image_selected.emit("")

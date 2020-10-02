@@ -5,7 +5,7 @@ import sys
 
 from PySide2.QtWidgets import QApplication
 
-from egophoto.ui.main_window import MainWindow
+from egophoto.main_window import MainWindow
 
 
 def main():

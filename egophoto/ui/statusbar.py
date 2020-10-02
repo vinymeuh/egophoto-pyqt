@@ -25,12 +25,8 @@ class StatusBar(QStatusBar):
         self.refresh()
 
     def refresh(self):
-        if self.filecount == 0:
-            self.clearMessage()
-            return
-
-        if self.filecount == 1:
-            msg = "1 image"
+        if self.filecount <= 1:
+            msg = f"{self.filecount} image"
         else:
             msg = f"{self.filecount} images"
 

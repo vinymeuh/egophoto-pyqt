@@ -1,14 +1,15 @@
 # Copyright 2020 VinyMeuh. All rights reserved.
 # Use of the source code is governed by a MIT-style license that can be found in the LICENSE file.
 
-from datetime import datetime
 import os
 import re
+from datetime import datetime
+from functools import partial
 
-import PySide2
 from PySide2.QtCore import (
     QAbstractListModel,
     QModelIndex,
+    QPoint,
     QRect,
     QSize,
     Qt,
@@ -16,6 +17,7 @@ from PySide2.QtCore import (
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QListView,
+    QMenu,
     QStyle,
     QStyledItemDelegate,
 )
@@ -24,6 +26,9 @@ from PySide2.QtGui import (
     QImageReader,
     QPixmap,
 )
+
+from egophoto.ui.edit_xmp_location_window import EditXMPLocationWindow
+from egophoto.settings import app_settings
 
 THUMB_SIZE = 150
 
@@ -40,10 +45,18 @@ class ImgGridViewer(QListView):
             selectionMode=QAbstractItemView.ExtendedSelection,
             viewMode=QListView.IconMode,
         )
+        self.selected = None
+
         self.model = _ImgGridViewerModel()
         self.setModel(self.model)
+
         self.delegate = _ImgGridViewerDelegate()
         self.setItemDelegate(self.delegate)
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
+
+        self.selectionModel().selectionChanged.connect(self._onImagesSelectionChanged)
 
     def addItem(self, item):
         self.model.beginResetModel()
@@ -62,9 +75,32 @@ class ImgGridViewer(QListView):
         self.model.items.sort()
         self.model.endResetModel()
 
-    def paintEvent(self, e: PySide2.QtGui.QPaintEvent):
-        print(f"{e.region()} {e.region()}")
-        super().paintEvent(e)
+    def showContextMenu(self, point: QPoint):
+        menu = QMenu(self)
+
+        menu.addAction("Informations")
+        menu.addSeparator()
+
+        xmp_location = menu.addMenu("Lieu")
+        xmp_location.addAction("Editer", partial(self.editXMPLocation))
+        xmp_location.addSeparator()
+        for country in app_settings.preferences.xmp_locations.keys():
+            submenu = xmp_location.addMenu(country)
+            for city in app_settings.preferences.xmp_locations.get(country):
+                submenu.addAction(city, partial(self.editXMPLocation, country, city))
+
+        xmp_type = menu.addMenu("Type")
+        xmp_type.addAction("Editer")
+
+        menu.exec_(self.mapToGlobal(point))
+
+    def editXMPLocation(self, country="", city=""):
+        print(self.selected)
+        EditXMPLocationWindow(country, city).exec_()
+
+    def _onImagesSelectionChanged(self, selected, deselected):
+        images = self.selectionModel().selectedIndexes()
+        self.selected = [images[i].data(Qt.DisplayRole) for i in range(len(images))]
 
 
 class _ImgGridViewerModel(QAbstractListModel):

@@ -5,15 +5,13 @@ import os
 from datetime import datetime
 
 from PySide2.QtCore import (
-    Qt,
     QDir,
     Signal
 )
 from PySide2.QtWidgets import (
     QFileSystemModel,
-    QLabel,
     QPushButton,
-    QSplitter,
+    QTabWidget,
     QTreeView,
     QVBoxLayout,
     QWidget
@@ -24,7 +22,7 @@ class ImgDirBrowser(QWidget):
     selected = Signal(str)
 
     def __init__(self, root_path=None):
-        QWidget.__init__(self)
+        super().__init__()
 
         self.root_path = root_path
         self.dirTreeView = QTreeView()
@@ -43,17 +41,27 @@ class ImgDirBrowser(QWidget):
         # select first catalog entry
         self.dirTreeView.setRootIndex(self.dirTreeModel.index(self.root_path))
 
-        button = QPushButton("Dernier répertoire")
-        button.clicked.connect(self._onButtonClicked)
+        # initialize tabs
+        tabs = QTabWidget(
+            tabPosition=QTabWidget.North, tabBarAutoHide=False
+        )
+        tab1 = QWidget()
+        tab2 = QWidget()
+        tabs.setCurrentIndex(0)
 
-        splitter = QSplitter(Qt.Vertical)
-        splitter.addWidget(button)
-        splitter.addWidget(self.dirTreeView)
-
+        tabs.addTab(tab1, "Répertoires")
+        #tabs.addTab(tab2, "Albums")
         layout = QVBoxLayout()
-        layout.addWidget(QLabel("Albums"), 0, Qt.AlignTop)
-        layout.addWidget(splitter)
         self.setLayout(layout)
+        layout.addWidget(tabs)
+
+        # tab1
+        layout1 = QVBoxLayout()
+        button = QPushButton("Dernier en date")
+        button.clicked.connect(self._onButtonClicked)
+        layout1.addWidget(button)
+        layout1.addWidget(self.dirTreeView)
+        tab1.setLayout(layout1)
 
     def _onButtonClicked(self):
         year = datetime.now().year
