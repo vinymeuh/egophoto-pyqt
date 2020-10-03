@@ -2,7 +2,8 @@
 # Use of the source code is governed by a MIT-style license that can be found in the LICENSE file.
 
 import os
-import re
+
+from typing import List
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
@@ -15,15 +16,12 @@ from PySide2.QtWidgets import (
 
 from egophoto.metadata import ImageInfo
 
-
 COLUMN_HEADERS = ["Fichier", "Titre", "Evenement", "Tag(s)", "Personne(s)", "Type(s)", "Ville", "Pays"]
 
 
 class InfoListWindow(QDialog):
 
-    pattern = re.compile('.*\.(jpg|jpeg)$', re.IGNORECASE)
-
-    def __init__(self, path: str, parent=None):
+    def __init__(self, images: List[str], parent=None):
         super().__init__(parent)
         self.setModal(True)
 
@@ -38,8 +36,6 @@ class InfoListWindow(QDialog):
         table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-        images = [path + "/" + f for f in os.listdir(path) if self.pattern.match(f)]
-        images.sort()
         table.setRowCount(len(images))
         for row in range(len(images)):
             img = images[row]

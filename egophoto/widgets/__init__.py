@@ -1,9 +1,9 @@
-from egophoto.widgets.img_dir_browser import ImgDirBrowser
-from egophoto.widgets.img_grid_viewer import ImgGridViewer
+from egophoto.widgets.img_browser_widget import ImgBrowserWidget
+from egophoto.widgets.img_grid_widget import ImgGridWidget
 from egophoto.widgets.img_tag_viewer import ImgTagViewer
 
 __all__ = [
-    ImgDirBrowser,
-    ImgGridViewer,
+    ImgBrowserWidget,
+    ImgGridWidget,
     ImgTagViewer,
 ]
