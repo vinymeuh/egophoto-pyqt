@@ -12,7 +12,7 @@ from PySide2.QtWidgets import (
     QWidget
 )
 
-from egophoto.metadata.image_info import ImageInfo
+from egophoto.metadata.image_metadata import ImageMetadata
 
 
 class ImgTagViewerItem(QWidget):
@@ -114,21 +114,21 @@ class ImgTagViewer(QWidget):
         self._country.clear()
 
     def setFile(self, path):
-        info = ImageInfo(path)
+        info = ImageMetadata(path)
 
         # file_group
         self._name.setValue(info.file.name)
         # exif_group
-        self._artist.setValue(info.tags.exif_artist)
-        self._copyright.setValue(info.tags.exif_copyright)
-        self._date.setValue(info.tags.exif_date)
-        self._make.setValue(info.tags.exif_make)
-        self._model.setValue(info.tags.exif_model)
+        self._artist.setValue(info.tags.artist)
+        self._copyright.setValue(info.tags.copyright)
+        self._date.setValue(info.tags.date)
+        self._make.setValue(info.tags.camera_make)
+        self._model.setValue(info.tags.camera_model)
         # xmp_group
-        self._title.setValue(info.tags.xmp_title)
-        self._subject.setValue(str(info.tags.xmp_subject))
-        self._type.setValue(str(info.tags.xmp_type))
-        self._person.setValue(str(info.tags.xmp_person))
-        self._event.setValue(info.tags.xmp_event)
-        self._city.setValue(info.tags.xmp_city)
-        self._country.setValue(info.tags.xmp_country)
+        self._title.setValue(info.tags.title)
+        self._subject.setValue(str(info.tags.tags))
+        self._type.setValue(str(info.tags.categories))
+        self._person.setValue(str(info.tags.persons))
+        self._event.setValue(info.tags.event)
+        self._city.setValue(info.tags.city)
+        self._country.setValue(info.tags.country)
