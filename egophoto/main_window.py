@@ -21,6 +21,7 @@ from egophoto.settings import app_settings
 from egophoto.ui import (
     EditXMPLocationWindow,
     InfoListWindow,
+    InformationsWindow,
     SlideShowWindow,
     StatusBar,
 )
@@ -34,10 +35,19 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setWindowTitle("EgoPhoto")
+
+        # attributes
         self.imgBrowserWidget = ImgBrowserWidget(app_settings.preferences.rootpath_jpeg)
         self.imgGridWidget = ImgGridWidget()
         self.images: List[str] = []
         """List of image paths displayed by the images grid"""
+
+        # set window size
+        app = QApplication.instance()  # don't like using qApp
+        geometry = app.desktop().availableGeometry(self)
+        self.setMinimumSize(geometry.width() * 0.5, geometry.height() * 0.5)
+        self.resize(geometry.width() * 0.6, geometry.height() * 0.6)
 
         # central widget
         splitter = QSplitter(Qt.Horizontal)
@@ -57,12 +67,6 @@ class MainWindow(QMainWindow):
 
         # status bar
         self.setStatusBar(StatusBar())
-
-        # set window size
-        app = QApplication.instance()  # don't like using qApp
-        geometry = app.desktop().availableGeometry(self)
-        self.setMinimumSize(geometry.width() * 0.5, geometry.height() * 0.5)
-        self.resize(geometry.width() * 0.6, geometry.height() * 0.6)
 
         # signals
         self.imgBrowserWidget.imageListUpdated.connect(self.loadImagesGrid)
@@ -90,7 +94,7 @@ class MainWindow(QMainWindow):
     def showImageContextMenu(self, point: QPoint):
         menu = QMenu(self)
 
-        menu.addAction("Informations")
+        menu.addAction("Informations", partial(self.showInformations))
         menu.addSeparator()
 
         xmp_location = menu.addMenu("Lieu")
@@ -105,3 +109,7 @@ class MainWindow(QMainWindow):
         xmp_type.addAction("Editer")
 
         menu.exec_(self.imgGridWidget.mapToGlobal(point))
+
+    def showInformations(self):
+        print(self.imgGridWidget.selected)
+        InformationsWindow(self.imgGridWidget.selected[0]).exec_()  # TODO
