@@ -1,5 +1,5 @@
-from egophoto.metadata.image_info import ImageInfo
+from egophoto.metadata.image_metadata import ImageMetadata
 
 __all__ = [
-    ImageInfo,
+    ImageMetadata,
 ]
