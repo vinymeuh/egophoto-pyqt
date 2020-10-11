@@ -20,8 +20,8 @@ from PySide2.QtWidgets import (
 from egophoto.settings import app_settings
 from egophoto.ui import (
     EditXMPLocationWindow,
-    InfoListWindow,
-    InformationsWindow,
+    PhotoInformationListWindow,
+    PhotoInformationWindow,
     SlideShowWindow,
     StatusBar,
 )
@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F1:
-            InfoListWindow(self.images).exec_()
+            PhotoInformationListWindow(self.images).exec_()
         if event.key() == Qt.Key_F2:
             SlideShowWindow().exec_()
 
@@ -112,4 +112,4 @@ class MainWindow(QMainWindow):
 
     def showInformations(self):
         print(self.imgGridWidget.selected)
-        InformationsWindow(self.imgGridWidget.selected[0]).exec_()  # TODO
+        PhotoInformationWindow(self.imgGridWidget.selected[0]).exec_()  # TODO

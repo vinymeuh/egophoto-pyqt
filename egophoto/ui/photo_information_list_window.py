@@ -2,7 +2,6 @@
 # Use of the source code is governed by a MIT-style license that can be found in the LICENSE file.
 
 import os
-
 from typing import List
 
 from PySide2.QtCore import Qt
@@ -19,7 +18,7 @@ from egophoto.metadata import ImageMetadata
 COLUMN_HEADERS = ["Fichier", "Titre", "Evenement", "Tag(s)", "Personne(s)", "Type(s)", "Ville", "Pays"]
 
 
-class InfoListWindow(QDialog):
+class PhotoInformationListWindow(QDialog):
 
     def __init__(self, images: List[str], parent=None):
         super().__init__(parent)
@@ -43,9 +42,9 @@ class InfoListWindow(QDialog):
             table.setItem(row, 0, QTableWidgetItem(os.path.basename(path)))
             table.setItem(row, 1, QTableWidgetItem(metadata.title))
             table.setItem(row, 2, QTableWidgetItem(metadata.event))
-            table.setItem(row, 3, QTableWidgetItem(str(metadata.tags)))
-            table.setItem(row, 4, QTableWidgetItem(str(metadata.persons)))
-            table.setItem(row, 5, QTableWidgetItem(str(metadata.categories)))
+            table.setItem(row, 3, QTableWidgetItem(" ".join(metadata.tags)))
+            table.setItem(row, 4, QTableWidgetItem(" ".join(metadata.persons)))
+            table.setItem(row, 5, QTableWidgetItem(" ".join(metadata.categories)))
             table.setItem(row, 6, QTableWidgetItem(metadata.city))
             table.setItem(row, 7, QTableWidgetItem(metadata.country))
         table.resizeColumnsToContents()
