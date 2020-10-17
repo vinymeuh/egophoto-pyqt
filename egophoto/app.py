@@ -5,16 +5,18 @@ import sys
 
 from PySide2.QtWidgets import QApplication
 
-from egophoto.main_window import MainWindow
+from egophoto.themes import setThemeBlenderOrange
+from egophoto.ui.main_window import MainWindow
 
 
 def main():
-    app = QApplication([])
+    app = QApplication(sys.argv)
     app.setApplicationName("EgoPhoto")
+
+    setThemeBlenderOrange(app)
 
     window = MainWindow()
     window.show()
-
     sys.exit(app.exec_())
 
 

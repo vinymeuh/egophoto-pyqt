@@ -17,7 +17,7 @@ class ImgBrowserWidget(QTabWidget):
 
     def __init__(self, browser_dir_root: str):
         super().__init__(
-            tabPosition=QTabWidget.North,
+            tabPosition=QTabWidget.West,
             tabBarAutoHide=False,
         )
         self.setLayout(QVBoxLayout())

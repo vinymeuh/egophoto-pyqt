@@ -8,6 +8,7 @@ from datetime import datetime
 from PySide2.QtCore import (
     QDir,
     QModelIndex,
+    Qt,
     Signal,
 )
 from PySide2.QtWidgets import (
@@ -42,11 +43,10 @@ class ImgDirBrowserWidget(QWidget):
         self.dirTreeView.setColumnHidden(3, True)
 
         layout = QVBoxLayout()
+        layout.addWidget(self.dirTreeView)
         button = QPushButton("Dernier en date")
         layout.addWidget(button)
-        layout.addWidget(self.dirTreeView)
         self.setLayout(layout)
-
         self.dirTreeView.clicked.connect(self._onDirectorySelected)
         button.clicked.connect(self._onButtonClicked)
 

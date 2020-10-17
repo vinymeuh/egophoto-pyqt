@@ -59,7 +59,7 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layout.addWidget(splitter)
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(10, 10, 10, 10)
 
         centralWidget = QWidget()
         centralWidget.setLayout(layout)
