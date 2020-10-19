@@ -29,9 +29,9 @@ QTableWidget
 }
 
 /* ====== QList ====== */
-QListView
-{
+QListView {
     background-color: #404040;
+    margin-top: 9px;
 }
 
 /* ====== QTree ====== */

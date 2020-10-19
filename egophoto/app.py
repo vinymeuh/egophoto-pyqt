@@ -5,7 +5,7 @@ import sys
 
 from PySide2.QtWidgets import QApplication
 
-from egophoto.themes import setThemeBlenderOrange
+from egophoto.themes import setThemeDarkOrange
 from egophoto.ui.main_window import MainWindow
 
 
@@ -13,7 +13,7 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("EgoPhoto")
 
-    setThemeBlenderOrange(app)
+    setThemeDarkOrange(app)
 
     window = MainWindow()
     window.show()

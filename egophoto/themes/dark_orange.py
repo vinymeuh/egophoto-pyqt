@@ -9,10 +9,10 @@ from PySide2.QtGui import (
 )
 from PySide2.QtWidgets import QApplication
 
-QSS = os.path.join(os.path.dirname(os.path.realpath(__file__)), "blender_orange.qss")
+QSS = os.path.join(os.path.dirname(os.path.realpath(__file__)), "dark_orange.qss")
 
 
-def setThemeBlenderOrange(app: QApplication):
+def setThemeDarkOrange(app: QApplication):
     app.setStyle('Fusion')
 
     palette = QPalette()
