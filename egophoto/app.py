@@ -5,15 +5,21 @@ import sys
 
 from PySide2.QtWidgets import QApplication
 
-from egophoto.themes import setThemeDarkOrange
 from egophoto.ui.main_window import MainWindow
+import egophoto.resources
 
+from PySide2.QtCore import QFile
 
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("EgoPhoto")
 
-    setThemeDarkOrange(app)
+    app.setStyle("Fusion")
+
+    qss_file = QFile(":/qss/stylesheet.qss")
+    qss_file.open(QFile.ReadOnly)
+    app.setStyleSheet(str(qss_file.readAll(), 'utf-8'))
+    qss_file.close()
 
     window = MainWindow()
     window.show()

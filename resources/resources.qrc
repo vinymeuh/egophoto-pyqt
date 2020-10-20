@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="qss">
+        <file alias="stylesheet.qss">qss/dark_orange.qss</file>
+    </qresource>
+</RCC>
