@@ -8,7 +8,8 @@ from PySide2.QtWidgets import QApplication
 from egophoto.ui.main_window import MainWindow
 import egophoto.resources
 
-from PySide2.QtCore import QFile
+from PySide2.QtCore import QFile, QTextStream
+
 
 def main():
     app = QApplication(sys.argv)
@@ -17,9 +18,11 @@ def main():
     app.setStyle("Fusion")
 
     qss_file = QFile(":/qss/stylesheet.qss")
-    qss_file.open(QFile.ReadOnly)
-    app.setStyleSheet(str(qss_file.readAll(), 'utf-8'))
-    qss_file.close()
+    if qss_file.exists():
+        qss_file.open(QFile.ReadOnly | QFile.Text)
+        stylesheet = QTextStream(qss_file).readAll()
+        app.setStyleSheet(stylesheet)
+        qss_file.close()
 
     window = MainWindow()
     window.show()

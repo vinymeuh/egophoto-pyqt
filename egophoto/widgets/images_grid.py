@@ -12,11 +12,11 @@ from PySide2.QtWidgets import (
     QListView,
 )
 
-from egophoto.widgets.img_grid_model import ImgGridModel
-from egophoto.widgets.img_grid_delegate import ImgGridDelegate
+from egophoto.widgets.images_grid_model import ImgGridModel
+from egophoto.widgets.images_grid_delegate import ImgGridDelegate
 
 
-class ImgGridWidget(QListView):
+class ImagesGrid(QListView):
 
     def __init__(self, thumb_size=150):
         super().__init__(

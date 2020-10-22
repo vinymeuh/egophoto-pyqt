@@ -1,3 +1,32 @@
 QWidget {
     background-color: "{{color_background}}";
+    color: "{{color_text}}";
+}
+
+QTabBar::tab {
+    background-color: "{{color_background}}";
+}
+
+QTabBar::tab:selected {
+    background-color: "{{color_highlight}}";
+    color: "{{color_highlight_text}}";
+}
+
+QTabWidget::pane {
+    border: none;
+    margin: 0px;
+}
+
+QTabWidget::tab-bar {
+    top: 20px; /* move to the bottom */
+}
+
+ImagesGrid {
+    background-color: "{{color_viewport}}";
+}
+
+DirectoryBrowserTab > QTreeView {
+    background-color: "{{color_viewport}}";
+    selection-background-color: "{{color_highlight}}";
+    margin: 0px;
 }

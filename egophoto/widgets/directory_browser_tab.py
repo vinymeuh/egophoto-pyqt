@@ -8,7 +8,6 @@ from datetime import datetime
 from PySide2.QtCore import (
     QDir,
     QModelIndex,
-    Qt,
     Signal,
 )
 from PySide2.QtWidgets import (
@@ -21,7 +20,8 @@ from PySide2.QtWidgets import (
 
 FILE_PATTERN = re.compile('.*\.(jpg|jpeg)$', re.IGNORECASE)
 
-class ImgDirBrowserWidget(QWidget):
+
+class DirectoryBrowserTab(QWidget):
 
     imageListUpdated = Signal(list)
 

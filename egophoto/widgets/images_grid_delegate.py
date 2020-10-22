@@ -10,11 +10,11 @@ from PySide2.QtCore import (
     Qt,
 )
 from PySide2.QtWidgets import (
+    QApplication,
     QStyle,
     QStyledItemDelegate,
 )
 from PySide2.QtGui import (
-    QColor,
     QImageReader,
     QPainterPath,
     QPen,
@@ -23,6 +23,7 @@ from PySide2.QtGui import (
 
 IMAGE_THUMB_RATIO = 0.9
 IMAGE_THUMB_OFFSET = 0.5 * (1 - IMAGE_THUMB_RATIO)
+
 
 class ImgGridDelegate(QStyledItemDelegate):
 
@@ -75,7 +76,7 @@ class ImgGridDelegate(QStyledItemDelegate):
         painter.drawPixmap(pixmap_rect, pixmap)
 
         # draw the rectangle around the whole thumbnail
-        pen = QPen(qApp.palette().window().color())
+        pen = QPen(QApplication.instance().palette().window().color())
         painter.setPen(pen)
         rect_border = QPainterPath()
         rect_border.addRect(rect)
