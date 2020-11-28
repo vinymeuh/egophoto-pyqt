@@ -3,20 +3,23 @@
 
 import sys
 
+from PySide2.QtCore import QFile, QTextStream
 from PySide2.QtWidgets import QApplication
 
-from egophoto.ui.main_window import MainWindow
-import egophoto.resources
+from egophoto.main_window import MainWindow
 
-from PySide2.QtCore import QFile, QTextStream
+# noinspection PyUnresolvedReferences
+import egophoto.resources
 
 
 def main():
+    # create the app
     app = QApplication(sys.argv)
     app.setApplicationName("EgoPhoto")
+    app.setDesktopFileName("egophoto.desktop")
 
+    # initialize the app style
     app.setStyle("Fusion")
-
     qss_file = QFile(":/qss/stylesheet.qss")
     if qss_file.exists():
         qss_file.open(QFile.ReadOnly | QFile.Text)
@@ -24,8 +27,11 @@ def main():
         app.setStyleSheet(stylesheet)
         qss_file.close()
 
-    window = MainWindow()
-    window.show()
+    # create the main window
+    mw = MainWindow()
+    mw.show()
+
+    # start the event loop
     sys.exit(app.exec_())
 
 

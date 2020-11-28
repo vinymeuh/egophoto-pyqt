@@ -33,23 +33,28 @@ from egophoto.widgets import (
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("EgoPhoto")
-
-        # attributes
-        self.imagesSelector = ImagesSelector(app_settings.preferences.rootpath_jpeg)
-        self.imagesGrid = ImagesGrid()
         self.images: List[str] = []
-        """List of image paths displayed by the images grid"""
+        self.imagesGrid = ImagesGrid()
+        self.imagesSelector = ImagesSelector(app_settings.preferences.rootpath_jpeg)
 
         # set window size
-        app = QApplication.instance()  # don't like using qApp
+        app = QApplication.instance()
         geometry = app.desktop().availableGeometry(self)
         self.setMinimumSize(geometry.width() * 0.5, geometry.height() * 0.5)
         self.resize(geometry.width() * 0.6, geometry.height() * 0.6)
 
-        # central widget
+        # setup the ui
+        self.setWindowTitle("EgoPhoto")
+        self.setupCentralWidget()
+        self.setStatusBar(StatusBar())
+
+        # signals
+        self.imagesSelector.imageListUpdated.connect(self.loadImagesGrid)
+        self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
+
+    def setupCentralWidget(self) -> None:
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.imagesSelector)
         splitter.addWidget(self.imagesGrid)
@@ -60,20 +65,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(splitter)
         layout.setSpacing(0)
 
-        centralWidget = QWidget()
-        centralWidget.setLayout(layout)
-        self.setCentralWidget(centralWidget)
-
-        # status bar
-        self.setStatusBar(StatusBar())
-
-        # signals
-        self.imagesSelector.imageListUpdated.connect(self.loadImagesGrid)
-        self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
-
-    def closeEvent(self, event):
-        pass
-        #app_settings.save()
+        cw = QWidget()
+        cw.setLayout(layout)
+        self.setCentralWidget(cw)
 
     def editXMPLocation(self, country="", city=""):
         print(self.imagesGrid.selected)
