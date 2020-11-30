@@ -26,58 +26,51 @@ from egophoto.ui import (
     StatusBar,
 )
 from egophoto.widgets import (
-    ImgBrowserWidget,
-    ImgGridWidget,
+    ImagesSelector,
+    ImagesGrid,
 )
 
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("EgoPhoto")
-
-        # attributes
-        self.imgBrowserWidget = ImgBrowserWidget(app_settings.preferences.rootpath_jpeg)
-        self.imgGridWidget = ImgGridWidget()
         self.images: List[str] = []
-        """List of image paths displayed by the images grid"""
+        self.imagesGrid = ImagesGrid()
+        self.imagesSelector = ImagesSelector(app_settings.preferences.rootpath_jpeg)
 
         # set window size
-        app = QApplication.instance()  # don't like using qApp
+        app = QApplication.instance()
         geometry = app.desktop().availableGeometry(self)
         self.setMinimumSize(geometry.width() * 0.5, geometry.height() * 0.5)
         self.resize(geometry.width() * 0.6, geometry.height() * 0.6)
 
-        # central widget
+        # setup the ui
+        self.setWindowTitle("EgoPhoto")
+        self.setupCentralWidget()
+        self.setStatusBar(StatusBar())
+
+        # signals
+        self.imagesSelector.imageListUpdated.connect(self.loadImagesGrid)
+        self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
+
+    def setupCentralWidget(self) -> None:
         splitter = QSplitter(Qt.Horizontal)
-        splitter.addWidget(self.imgBrowserWidget)
-        splitter.addWidget(self.imgGridWidget)
+        splitter.addWidget(self.imagesSelector)
+        splitter.addWidget(self.imagesGrid)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
 
         layout = QHBoxLayout()
         layout.addWidget(splitter)
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
 
-        centralWidget = QWidget()
-        centralWidget.setLayout(layout)
-        self.setCentralWidget(centralWidget)
-
-        # status bar
-        self.setStatusBar(StatusBar())
-
-        # signals
-        self.imgBrowserWidget.imageListUpdated.connect(self.loadImagesGrid)
-        self.imgGridWidget.customContextMenuRequested.connect(self.showImageContextMenu)
-
-    def closeEvent(self, event):
-        pass
-        #app_settings.save()
+        cw = QWidget()
+        cw.setLayout(layout)
+        self.setCentralWidget(cw)
 
     def editXMPLocation(self, country="", city=""):
-        print(self.imgGridWidget.selected)
+        print(self.imagesGrid.selected)
         EditXMPLocationWindow(country, city).exec_()
 
     def keyPressEvent(self, event):
@@ -88,7 +81,7 @@ class MainWindow(QMainWindow):
 
     def loadImagesGrid(self, images: List[str]):
         self.images = images
-        self.imgGridWidget.setImages(images)
+        self.imagesGrid.setImages(images)
         self.statusBar().setFileCount(len(images))
 
     def showImageContextMenu(self, point: QPoint):
@@ -108,8 +101,8 @@ class MainWindow(QMainWindow):
         xmp_type = menu.addMenu("Type")
         xmp_type.addAction("Editer")
 
-        menu.exec_(self.imgGridWidget.mapToGlobal(point))
+        menu.exec_(self.imagesGrid.mapToGlobal(point))
 
     def showInformations(self):
-        print(self.imgGridWidget.selected)
-        PhotoInformationWindow(self.imgGridWidget.selected[0]).exec_()  # TODO
+        print(self.imagesGrid.selected)
+        PhotoInformationWindow(self.imagesGrid.selected[0]).exec_()  # TODO

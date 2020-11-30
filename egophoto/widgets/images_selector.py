@@ -9,19 +9,20 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from egophoto.widgets.img_dir_browser_widget import ImgDirBrowserWidget
+from egophoto.widgets.directory_browser_tab import DirectoryBrowserTab
 
 
-class ImgBrowserWidget(QTabWidget):
+class ImagesSelector(QTabWidget):
     imageListUpdated = Signal(list)
 
     def __init__(self, browser_dir_root: str):
         super().__init__(
-            tabPosition=QTabWidget.North,
+            tabPosition=QTabWidget.West,
             tabBarAutoHide=False,
         )
         self.setLayout(QVBoxLayout())
-        dirBrowserTab = ImgDirBrowserWidget(browser_dir_root)
+
+        dirBrowserTab = DirectoryBrowserTab(browser_dir_root)
         # TODO: Album browser
         # TODO: Search browser
 

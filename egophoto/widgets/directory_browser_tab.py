@@ -20,7 +20,8 @@ from PySide2.QtWidgets import (
 
 FILE_PATTERN = re.compile('.*\.(jpg|jpeg)$', re.IGNORECASE)
 
-class ImgDirBrowserWidget(QWidget):
+
+class DirectoryBrowserTab(QWidget):
 
     imageListUpdated = Signal(list)
 
@@ -42,11 +43,10 @@ class ImgDirBrowserWidget(QWidget):
         self.dirTreeView.setColumnHidden(3, True)
 
         layout = QVBoxLayout()
+        layout.addWidget(self.dirTreeView)
         button = QPushButton("Dernier en date")
         layout.addWidget(button)
-        layout.addWidget(self.dirTreeView)
         self.setLayout(layout)
-
         self.dirTreeView.clicked.connect(self._onDirectorySelected)
         button.clicked.connect(self._onButtonClicked)
 
