@@ -9,6 +9,7 @@ from PySide2.QtCore import (
     Qt,
 )
 from PySide2.QtWidgets import (
+    QAction,
     QApplication,
     QHBoxLayout,
     QMainWindow,
@@ -17,27 +18,21 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from egophoto.settings import app_settings
-from egophoto.ui import (
-    EditXMPLocationWindow,
-    PhotoInformationListWindow,
-    PhotoInformationWindow,
-    SlideShowWindow,
-    StatusBar,
-)
-from egophoto.widgets import (
-    ImagesSelector,
-    ImagesGrid,
-)
+import egophoto
+import egophoto.settings
+import egophoto.ui
+import egophoto.widgets
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
+        self.settings = egophoto.settings.Settings()
+
         self.images: List[str] = []
-        self.imagesGrid = ImagesGrid()
-        self.imagesSelector = ImagesSelector(app_settings.preferences.rootpath_jpeg)
+        self.imagesGrid = egophoto.widgets.ImagesGrid()
+        self.imagesSelector = egophoto.widgets.ImagesSelector(self.settings.directory_jpeg)
 
         # set window size
         app = QApplication.instance()
@@ -47,14 +42,22 @@ class MainWindow(QMainWindow):
 
         # setup the ui
         self.setWindowTitle("EgoPhoto")
-        self.setupCentralWidget()
-        self.setStatusBar(StatusBar())
+        self._setCentralWidget()
+        self._setCreateActions()
+        self._setMenuBar()
+        self.setStatusBar(egophoto.ui.StatusBar())
 
         # signals
         self.imagesSelector.imageListUpdated.connect(self.loadImagesGrid)
         self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
 
-    def setupCentralWidget(self) -> None:
+    def _setCreateActions(self) -> None:
+        self.settingsAction = QAction("Settings", self)
+        self.settingsAction.triggered.connect(lambda: egophoto.settings.EditSettings(self.settings, self).exec_())
+        self.aboutAction = QAction("About", self)
+        self.aboutAction.triggered.connect(lambda: egophoto.About(self).exec_())
+
+    def _setCentralWidget(self) -> None:
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.imagesSelector)
         splitter.addWidget(self.imagesGrid)
@@ -69,15 +72,21 @@ class MainWindow(QMainWindow):
         cw.setLayout(layout)
         self.setCentralWidget(cw)
 
+    def _setMenuBar(self) -> None:
+        menu = self.menuBar()
+        # Help
+        help_menu = menu.addMenu("Help")
+        help_menu.addAction(self.settingsAction)
+        help_menu.addSeparator()
+        help_menu.addAction(self.aboutAction)
+
     def editXMPLocation(self, country="", city=""):
         print(self.imagesGrid.selected)
-        EditXMPLocationWindow(country, city).exec_()
+        egophoto.ui.EditXMPLocationWindow(country, city).exec_()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F1:
-            PhotoInformationListWindow(self.images).exec_()
-        if event.key() == Qt.Key_F2:
-            SlideShowWindow().exec_()
+            egophoto.ui.PhotoInformationListWindow(self.images).exec_()
 
     def loadImagesGrid(self, images: List[str]):
         self.images = images
@@ -93,9 +102,9 @@ class MainWindow(QMainWindow):
         xmp_location = menu.addMenu("Lieu")
         xmp_location.addAction("Editer", partial(self.editXMPLocation))
         xmp_location.addSeparator()
-        for country in app_settings.preferences.xmp_locations.keys():
+        for country in self.settings.xmp_locations.keys():
             submenu = xmp_location.addMenu(country)
-            for city in app_settings.preferences.xmp_locations.get(country):
+            for city in self.settings.xmp_locations.get(country):
                 submenu.addAction(city, partial(self.editXMPLocation, country, city))
 
         xmp_type = menu.addMenu("Type")
@@ -105,4 +114,4 @@ class MainWindow(QMainWindow):
 
     def showInformations(self):
         print(self.imagesGrid.selected)
-        PhotoInformationWindow(self.imagesGrid.selected[0]).exec_()  # TODO
+        egophoto.ui.PhotoInformationWindow(self.imagesGrid.selected[0]).exec_()  # TODO
