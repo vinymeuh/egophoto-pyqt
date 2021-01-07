@@ -11,3 +11,9 @@ pyenv virtualenv egophoto
 pyenv activate egophoto
 pip install -r requirements-dev.txt
 ```
+
+Test:
+
+```
+PYTHONPATH=. pytest
+```

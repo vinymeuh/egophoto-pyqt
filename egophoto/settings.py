@@ -23,6 +23,8 @@ class Settings(QSettings):
         super().__init__(QSettings.IniFormat, QSettings.UserScope, "egophoto", "egophoto", parent)
 
         self.directory_jpeg = self.value("directories/jpeg", str(pathlib.Path.home()))
+        self.directory_raw = self.value("directories/raw", str(pathlib.Path.home()))
+        self.directory_input = self.value("directories/input", str(pathlib.Path.home()))
 
         self.xmp_locations: Dict[List[str]] = {}
         if "xmp_locations" in self.childGroups():
@@ -38,6 +40,8 @@ class Settings(QSettings):
 
     def save(self):
         self.setValue("directories/jpeg", self.directory_jpeg)
+        self.setValue("directories/raw", self.directory_raw)
+        self.setValue("directories/input", self.directory_raw)
         self.sync()
 
 
@@ -53,6 +57,10 @@ class EditSettings(QDialog):
         frm_layout = QFormLayout()
         self.e_directory_jpeg = QLineEdit(self.settings.directory_jpeg)
         frm_layout.addRow("JPEG base directory:", self.e_directory_jpeg)
+        self.e_directory_raw = QLineEdit(self.settings.directory_raw)
+        frm_layout.addRow("RAW base directory:", self.e_directory_raw)
+        self.e_directory_input = QLineEdit(self.settings.directory_input)
+        frm_layout.addRow("Input base directory:", self.e_directory_input)
 
         self.e_xmp_locations = QTableWidget()
         self.e_xmp_locations.setColumnCount(2)
@@ -77,5 +85,7 @@ class EditSettings(QDialog):
 
     def save(self):
         self.settings.directory_jpeg = self.e_directory_jpeg.text()
+        self.settings.directory_raw = self.e_directory_raw.text()
+        self.settings.directory_input = self.e_directory_input.text()
         self.settings.save()
         self.accept()
