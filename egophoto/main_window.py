@@ -20,6 +20,7 @@ from PySide2.QtWidgets import (
 
 import egophoto.about
 import egophoto.import_images
+import egophoto.images_selector
 import egophoto.settings
 import egophoto.ui
 import egophoto.widgets
@@ -36,7 +37,7 @@ class MainWindow(QMainWindow):
 
         self.images: List[str] = []
         self.imagesGrid = egophoto.widgets.ImagesGrid()
-        self.imagesSelector = egophoto.widgets.ImagesSelector(self.settings.directory_jpeg)
+        self.imagesSelector = egophoto.images_selector.ImagesSelector(self.settings.directory_jpeg)
 
         # set window size
         app = QApplication.instance()

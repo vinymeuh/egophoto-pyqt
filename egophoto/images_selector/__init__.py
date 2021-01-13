@@ -9,7 +9,7 @@ from PySide2.QtWidgets import (
     QVBoxLayout,
 )
 
-from egophoto.widgets.directory_browser_tab import DirectoryBrowserTab
+from egophoto.images_selector.directory_browser_tab import DirectoryBrowserTab
 
 
 class ImagesSelector(QTabWidget):
