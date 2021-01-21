@@ -10,6 +10,7 @@ from PySide2.QtCore import (
 )
 from PySide2.QtWidgets import (
     QAction,
+    QActionGroup,
     QApplication,
     QHBoxLayout,
     QMainWindow,
@@ -25,6 +26,7 @@ import egophoto.settings
 import egophoto.ui
 import egophoto.widgets
 
+from egophoto.images_viewer import ImagesViewer
 from egophoto.exiftool.exiftool import ExifToolDaemon
 
 
@@ -36,8 +38,9 @@ class MainWindow(QMainWindow):
         self.exiftool = ExifToolDaemon()
 
         self.images: List[str] = []
-        self.imagesGrid = egophoto.widgets.ImagesGrid()
         self.imagesSelector = egophoto.images_selector.ImagesSelector(self.settings.directory_jpeg)
+        self.imagesViewer = ImagesViewer()
+        self.imagesGrid = egophoto.widgets.ImagesGrid()  # TODO: remove
 
         # set window size
         app = QApplication.instance()
@@ -53,7 +56,7 @@ class MainWindow(QMainWindow):
         self.setStatusBar(egophoto.ui.StatusBar())
 
         # signals
-        self.imagesSelector.imageListUpdated.connect(self.loadImagesGrid)
+        self.imagesSelector.imageListUpdated.connect(self.displayImages)
         self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
 
     def closeEvent(self, event):
@@ -62,7 +65,7 @@ class MainWindow(QMainWindow):
     def _setCentralWidget(self) -> None:
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(self.imagesSelector)
-        splitter.addWidget(self.imagesGrid)
+        splitter.addWidget(self.imagesViewer)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
 
@@ -75,27 +78,45 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(cw)
 
     def _setCreateActions(self) -> None:
-        self.aboutAction = QAction("About", self)
+        self.aboutAction = QAction("A propos", self)
         self.aboutAction.triggered.connect(lambda: egophoto.about.About(self).exec_())
-        self.exitAction = QAction("Exit", self)
+
+        self.exitAction = QAction("Quitter", self)
         self.exitAction.triggered.connect(self.close)
-        self.importAction = QAction("Import Images ...", self)
+
+        self.importAction = QAction("Importer des images ...", self)
         self.importAction .triggered.connect(lambda: egophoto.import_images.ImportImagesDialog(self.settings, self).exec_())
-        self.settingsAction = QAction("Settings", self)
+
+        self.settingsAction = QAction("Configuration", self)
         self.settingsAction.triggered.connect(lambda: egophoto.settings.EditSettings(self.settings, self).exec_())
+
+        self.viewGridAction = QAction("Vignette")
+        self.viewGridAction.setCheckable(True)
+        self.viewGridAction.setChecked(True)
+        self.viewGridAction.triggered.connect(self.imagesViewer.displayGridView)
+        self.viewListAction = QAction("Liste")
+        self.viewListAction.setCheckable(True)
+        self.viewListAction.triggered.connect(self.imagesViewer.displayListView)
+        view_action_group = QActionGroup(self)
+        view_action_group.addAction(self.viewGridAction)
+        view_action_group.addAction(self.viewListAction)
 
     def _setMenuBar(self) -> None:
         menu = self.menuBar()
         # File
-        file_menu = menu.addMenu("File")
+        file_menu = menu.addMenu("Fichier")
         file_menu.addAction(self.importAction)
         file_menu.addSeparator()
         file_menu.addAction(self.exitAction)
+        # View
+        view_menu = menu.addMenu("Vue")
+        view_menu.addAction(self.viewGridAction)
+        view_menu.addAction(self.viewListAction)
         # Tools
-        tools_menu = menu.addMenu("Tools")
+        tools_menu = menu.addMenu("Outils")
         tools_menu.addAction(self.settingsAction)
         # Help
-        help_menu = menu.addMenu("Help")
+        help_menu = menu.addMenu("Aide")
         help_menu.addAction(self.aboutAction)
 
     def editXMPLocation(self, country="", city=""):
@@ -105,10 +126,16 @@ class MainWindow(QMainWindow):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F1:
             egophoto.ui.PhotoInformationListWindow(self.images).exec_()
+        if event.key() == Qt.Key_F2:
+            self.viewGridAction.setChecked(True)
+            self.imagesViewer.displayGridView()
+        if event.key() == Qt.Key_F3:
+            self.viewListAction.setChecked(True)
+            self.imagesViewer.displayListView()
 
-    def loadImagesGrid(self, images: List[str]):
+    def displayImages(self, images: List[str]):
         self.images = images
-        self.imagesGrid.setImages(images)
+        self.imagesViewer.setImages(images)
         self.statusBar().setFileCount(len(images))
 
     def showImageContextMenu(self, point: QPoint):
@@ -133,3 +160,4 @@ class MainWindow(QMainWindow):
     def showInformations(self):
         print(self.imagesGrid.selected)
         egophoto.ui.PhotoInformationWindow(self.imagesGrid.selected[0]).exec_()  # TODO
+
