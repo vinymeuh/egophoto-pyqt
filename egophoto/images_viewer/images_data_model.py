@@ -12,6 +12,17 @@ from PySide2.QtCore import (
 
 from egophoto.images_viewer.image import Image
 
+ATTRIBUTES_MAPPING = [
+    ("Fichier", lambda x: os.path.basename(x.path)),
+    ("Titre", lambda x: x.title),
+    ("Evenement", lambda x: x.event),
+    ("Tag(s)", lambda x: x.tags),
+    ("Personne(s)", lambda x: x.persons),
+    ("Type(s)", lambda x: x.categories),
+    ("Ville", lambda x: x.city),
+    ("Pays", lambda x: x.country),
+]
+
 
 class ImagesDataModel(QAbstractItemModel):
 
@@ -20,7 +31,7 @@ class ImagesDataModel(QAbstractItemModel):
         self.images = []
 
     def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
-        return 1
+        return len(ATTRIBUTES_MAPPING)
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         return len(self.images)
@@ -37,8 +48,7 @@ class ImagesDataModel(QAbstractItemModel):
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole) -> Any:
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            if section == 0:
-                return "Fichier"
+            return ATTRIBUTES_MAPPING[section][0]
         return super().headerData(section, orientation, role)
 
     def data(self, index: QModelIndex, role: int = Qt.DisplayRole) -> Any:
@@ -46,14 +56,13 @@ class ImagesDataModel(QAbstractItemModel):
         column = index.column()
         image = self.images[row]
         if role == Qt.DisplayRole:
-            if column == 0:
-                return os.path.basename(image.path)
+            f = ATTRIBUTES_MAPPING[column][1]
+            return f(image)
 
     def setImages(self, paths: List[str]):
         self.beginResetModel()
         self.images = []
         for path in paths:
-            img = Image()
-            img.setPath(path)
+            img = Image(path)
             self.images.append(img)
         self.endResetModel()
