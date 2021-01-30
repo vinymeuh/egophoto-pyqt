@@ -3,6 +3,28 @@
 
 from typing import List
 
+from egophoto.exiftool.exiftool_daemon import exifToolDaemon
+
+TAGS = [
+    "exif:Artist",
+    "exif:Copyright",
+    #"exif:DateTimeOriginal",
+    #"exif.LensInfo",
+    "exif:LensModel",
+    # "exif:Make",
+    # "exif:Model",
+    # "exif:Software",
+    # "xmp-dc:Subject",
+    # "xmp-dc:Title",
+    # "xmp-dc:Type",
+    # "xmp-iptcext:Event",
+    "XMP:LocationShownCity",
+    "XMP:LocationShownCountryName",
+    # "xmp-iptcext:PersonInImage",
+    "XMP:Rating",
+]
+TAGS_CMDLINE = ["-G"] + ["-" + t for t in TAGS] + [""]
+
 
 class Image:
 
@@ -25,3 +47,16 @@ class Image:
         self.title: str = ""
         # attributes derived from a raw metadata tag
         self._date = ""
+
+    @classmethod
+    def load_from_exiftool(cls, path):
+        et = exifToolDaemon()
+        TAGS_CMDLINE[len(TAGS_CMDLINE)-1] = path
+        img_tags = et.execute_json(*TAGS_CMDLINE)[0]
+        print(img_tags)
+
+        img = Image(path)
+        img.artist = img_tags.get("EXIF:Artist", "")
+        img.city = img_tags.get("XMP:LocationShownCity", "")
+        img.country = img_tags.get("XMP:LocationShownCountryName", "")
+        return img

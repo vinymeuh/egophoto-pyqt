@@ -63,6 +63,6 @@ class ImagesDataModel(QAbstractItemModel):
         self.beginResetModel()
         self.images = []
         for path in paths:
-            img = Image(path)
+            img = Image.load_from_exiftool(path)
             self.images.append(img)
         self.endResetModel()

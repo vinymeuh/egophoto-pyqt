@@ -15,7 +15,7 @@ from PySide2.QtWidgets import (
 )
 
 from egophoto.settings import Settings
-from egophoto.exiftool.exiftool import ImageImporter
+from egophoto.exiftool.image_importer import ImageImporter
 
 
 class ImportImagesDialog(QDialog):

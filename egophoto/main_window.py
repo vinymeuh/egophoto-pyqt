@@ -27,7 +27,7 @@ import egophoto.ui
 import egophoto.widgets
 
 from egophoto.images_viewer import ImagesViewer
-from egophoto.exiftool.exiftool import ExifToolDaemon
+from egophoto.exiftool.exiftool_daemon import exifToolDaemon
 
 
 class MainWindow(QMainWindow):
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.settings = egophoto.settings.Settings()
-        self.exiftool = ExifToolDaemon()
+        self.exiftool = exifToolDaemon()
 
         self.images: List[str] = []
         self.imagesSelector = egophoto.images_selector.ImagesSelector(self.settings.directory_jpeg)
