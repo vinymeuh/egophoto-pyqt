@@ -28,7 +28,7 @@ class ImageImporter(QProcess):
         exiftool_args = [
             "-o", "/dummy",
             "-d", f"{self.target_dir}/%Y/%Y-%m-%d/%Y%m%d_%H%M%S_%%f.%%e",
-            "-testname<CreateDate",
+            "<CreateDate",
             "-filename<DateTimeOriginal",
             self.source_dir
         ]
