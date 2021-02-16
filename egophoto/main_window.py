@@ -27,7 +27,6 @@ import egophoto.ui
 import egophoto.widgets
 
 from egophoto.images_viewer import ImagesViewer
-from egophoto.exiftool.exiftool_daemon import exifToolDaemon
 
 
 class MainWindow(QMainWindow):
@@ -35,7 +34,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.settings = egophoto.settings.Settings()
-        self.exiftool = exifToolDaemon()
 
         self.images: List[str] = []
         self.imagesSelector = egophoto.images_selector.ImagesSelector(self.settings.directory_jpeg)
@@ -60,7 +58,7 @@ class MainWindow(QMainWindow):
         self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
 
     def closeEvent(self, event):
-        self.exiftool.terminate()
+        pass
 
     def _setCentralWidget(self) -> None:
         splitter = QSplitter(Qt.Horizontal)

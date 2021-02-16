@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from typing import List
 
-from egophoto.exiftool.exiftool_daemon import exifToolDaemon
+from egophoto.exiftool.exiftool import ExifTool
 
 TAGS = [
     "EXIF:Artist",
@@ -62,30 +62,66 @@ class Image:
     def load_from_exiftool(cls, path):
         if not os.path.isfile(path):
             raise FileNotFoundError
+
         et = exifToolDaemon()
         TAGS_CMDLINE[len(TAGS_CMDLINE)-1] = path
-        img_tags = et.execute_json(*TAGS_CMDLINE)[0]
-
+        print(f"{path}: ")
         img = Image(path)
-        # EXIF
-        img.artist = img_tags.get("EXIF:Artist")
-        img.copyright = img_tags.get("EXIF:Copyright")
-        img.camera_make = img_tags.get("EXIF:Make")
-        img.camera_model = img_tags.get("EXIF:Model")
-        img._date = img_tags.get('EXIF:DateTimeOriginal')
-        img.lens = img_tags.get('EXIF:LensModel') or img_tags.get('EXIF:LensInfo')
-        img.software = img_tags.get("EXIF:Software")
-        # XMP
-        img.categories = _as_list(img_tags.get('XMP:Type', []))
-        img.city = img_tags.get("XMP:LocationShownCity")
-        img.country = img_tags.get("XMP:LocationShownCountryName")
-        img.event = img_tags.get("XMP:Event")
-        img.persons = _as_list(img_tags.get('XMP:PersonInImage', []))
-        img.score = img_tags.get("XMP:Rating", 0)
-        img.tags = _as_list(img_tags.get('XMP:Subject', []))
-        img.title = img_tags.get("XMP:Title")
+        try:
+            img_tags = et.execute_json(*TAGS_CMDLINE)[0]
+            # EXIF
+            img.artist = img_tags.get("EXIF:Artist")
+            img.copyright = img_tags.get("EXIF:Copyright")
+            img.camera_make = img_tags.get("EXIF:Make")
+            img.camera_model = img_tags.get("EXIF:Model")
+            img._date = img_tags.get('EXIF:DateTimeOriginal')
+            img.lens = img_tags.get('EXIF:LensModel') or img_tags.get('EXIF:LensInfo')
+            img.software = img_tags.get("EXIF:Software")
+            # XMP
+            img.categories = _as_list(img_tags.get('XMP:Type', []))
+            img.city = img_tags.get("XMP:LocationShownCity")
+            img.country = img_tags.get("XMP:LocationShownCountryName")
+            img.event = img_tags.get("XMP:Event")
+            img.persons = _as_list(img_tags.get('XMP:PersonInImage', []))
+            img.score = img_tags.get("XMP:Rating", 0)
+            img.tags = _as_list(img_tags.get('XMP:Subject', []))
+            img.title = img_tags.get("XMP:Title")
+        except Exception as e:
+            print(f"load_from_exiftool: {e}\n")
 
         return img
+
+    @classmethod
+    def load_batch_from_exiftool(cls, paths):
+        exiftool_args = ["-G", "-j"] + ["-" + t for t in TAGS] + paths
+        et = ExifTool()
+        images_json_list = et.execute_json(exiftool_args)
+
+        images = []
+        for image_json in images_json_list:
+            image = Image(image_json['SourceFile'])
+            # EXIF
+            image.artist = image_json.get("EXIF:Artist")
+            image.copyright = image_json.get("EXIF:Copyright")
+            image.camera_make = image_json.get("EXIF:Make")
+            image.camera_model = image_json.get("EXIF:Model")
+            image._date = image_json.get('EXIF:DateTimeOriginal')
+            image.lens = image_json.get('EXIF:LensModel') or image_json.get('EXIF:LensInfo')
+            image.software = image_json.get("EXIF:Software")
+            # XMP
+            image.categories = _as_list(image_json.get('XMP:Type', []))
+            image.city = image_json.get("XMP:LocationShownCity")
+            image.country = image_json.get("XMP:LocationShownCountryName")
+            image.event = image_json.get("XMP:Event")
+            image.persons = _as_list(image_json.get('XMP:PersonInImage', []))
+            image.score = image_json.get("XMP:Rating", 0)
+            image.tags = _as_list(image_json.get('XMP:Subject', []))
+            image.title = image_json.get("XMP:Title")
+
+            images.append(image)
+        return images
+
+
 
 
 def _as_list(value):

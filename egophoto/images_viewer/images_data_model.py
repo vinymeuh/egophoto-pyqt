@@ -61,8 +61,5 @@ class ImagesDataModel(QAbstractItemModel):
 
     def setImages(self, paths: List[str]):
         self.beginResetModel()
-        self.images = []
-        for path in paths:
-            img = Image.load_from_exiftool(path)
-            self.images.append(img)
+        self.images = Image.load_batch_from_exiftool(paths)
         self.endResetModel()
