@@ -1,47 +1,33 @@
 # Copyright 2020 VinyMeuh. All rights reserved.
 # Use of the source code is governed by a MIT-style license that can be found in the LICENSE file.
 
+from typing import Any, List
+
+import json
+
 from PySide2.QtCore import (
-    QProcess
+    QProcess,
 )
 
-exiftool_executable = "exiftool"
 
+class ExifTool(QProcess):
 
-class ExifToolDaemon(QProcess):
-
-    def __init__(self, parent=None):
+    def __init__(self, executable: str = "exiftool", parent=None):
         super().__init__(parent)
-        self.executable = exiftool_executable
-        self.start(self.executable, ["-stay_open", "True", "-@", "-"])
-        if not self.waitForStarted():
-            print("unable to start exiftool")
+        #self.setProcessChannelMode(QProcess.MergedChannels)
+        self.executable = executable
 
+    def execute(self, *params: List[str]) -> str:
+        self.start(self.executable, *params)
+        self.waitForFinished()
+        stdout = self.readAllStandardOutput().data().decode('utf8')
+        return stdout
 
-class ImageImporter(QProcess):
-
-    def __init__(self, source_dir, target_dir, parent=None):
-        super().__init__(parent)
-        self.setProcessChannelMode(QProcess.MergedChannels)
-        self.executable = exiftool_executable
-        self.source_dir = source_dir
-        self.target_dir = target_dir
-
-    def dry_run(self):
-        exiftool_args = [
-            "-d", f"{self.target_dir}/%Y/%Y-%m-%d/%Y%m%d_%H%M%S_%%f.%%e",
-            "-testname<CreateDate",
-            "-testname<DateTimeOriginal",
-            self.source_dir,
-        ]
-        self.start(self.executable, exiftool_args)
-
-    def run(self):
-        exiftool_args = [
-            "-o", "/dummy",
-            "-d", f"{self.target_dir}/%Y/%Y-%m-%d/%Y%m%d_%H%M%S_%%f.%%e",
-            "-testname<CreateDate",
-            "-filename<DateTimeOriginal",
-            self.source_dir
-        ]
-        self.start(self.executable, exiftool_args)
+    def execute_json(self, *params: List[str]) -> Any:
+        output = self.execute(*params)
+        jsondoc = ""
+        try:
+            jsondoc = json.loads(output)
+        except Exception as e:
+            print(f"execute_json: {e}, output={output}*****\n")
+        return jsondoc

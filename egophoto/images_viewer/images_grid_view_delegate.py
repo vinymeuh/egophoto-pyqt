@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 
 from PySide2.QtCore import (
+    QModelIndex,
     QRect,
     QSize,
     Qt,
@@ -25,16 +26,16 @@ IMAGE_THUMB_RATIO = 0.9
 IMAGE_THUMB_OFFSET = 0.5 * (1 - IMAGE_THUMB_RATIO)
 
 
-class ImgGridDelegate(QStyledItemDelegate):
+class ImagesGridViewDelegate(QStyledItemDelegate):
 
     def __init__(self, thumb_size: int):
         super().__init__()
         self.thumb_size = thumb_size    # size of image thumbnail + borders
         self.thumb_cache = {}
 
-    def paint(self, painter, option, index):
+    def paint(self, painter, option, index: QModelIndex):
         _paint_start = datetime.now()
-        path = index.data()
+        path = index.internalPointer()
         rect = option.rect
 
         # retrieve or prepare image thumbnail

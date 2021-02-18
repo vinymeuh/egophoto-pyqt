@@ -1,15 +1,13 @@
 # Copyright 2020 VinyMeuh. All rights reserved.
 # Use of the source code is governed by a MIT-style license that can be found in the LICENSE file.
 
-import pytest
-
 import errno
 import os.path
 import shutil
 
 from tests.conftest import Configuration
 
-from egophoto.exiftool.exiftool import ImageImporter
+from egophoto.exiftool.image_importer import ImageImporter
 
 
 def test_dry_run():
