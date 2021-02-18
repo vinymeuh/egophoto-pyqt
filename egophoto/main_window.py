@@ -23,6 +23,7 @@ import egophoto.about
 import egophoto.import_images
 import egophoto.images_selector
 import egophoto.settings
+import egophoto.statusbar
 import egophoto.ui
 
 from egophoto.images_viewer import ImagesViewer
@@ -49,7 +50,7 @@ class MainWindow(QMainWindow):
         self._setCentralWidget()
         self._setCreateActions()
         self._setMenuBar()
-        self.setStatusBar(egophoto.ui.StatusBar())
+        self.setStatusBar(egophoto.statusbar.StatusBar())
 
         # signals
         self.imagesSelector.imageListUpdated.connect(self.displayImages)
