@@ -59,39 +59,6 @@ class Image:
             return date.strftime("%Y-%m-%d %H:%M:%S")
 
     @classmethod
-    def load_from_exiftool(cls, path):
-        if not os.path.isfile(path):
-            raise FileNotFoundError
-
-        et = exifToolDaemon()
-        TAGS_CMDLINE[len(TAGS_CMDLINE)-1] = path
-        print(f"{path}: ")
-        img = Image(path)
-        try:
-            img_tags = et.execute_json(*TAGS_CMDLINE)[0]
-            # EXIF
-            img.artist = img_tags.get("EXIF:Artist")
-            img.copyright = img_tags.get("EXIF:Copyright")
-            img.camera_make = img_tags.get("EXIF:Make")
-            img.camera_model = img_tags.get("EXIF:Model")
-            img._date = img_tags.get('EXIF:DateTimeOriginal')
-            img.lens = img_tags.get('EXIF:LensModel') or img_tags.get('EXIF:LensInfo')
-            img.software = img_tags.get("EXIF:Software")
-            # XMP
-            img.categories = _as_list(img_tags.get('XMP:Type', []))
-            img.city = img_tags.get("XMP:LocationShownCity")
-            img.country = img_tags.get("XMP:LocationShownCountryName")
-            img.event = img_tags.get("XMP:Event")
-            img.persons = _as_list(img_tags.get('XMP:PersonInImage', []))
-            img.score = img_tags.get("XMP:Rating", 0)
-            img.tags = _as_list(img_tags.get('XMP:Subject', []))
-            img.title = img_tags.get("XMP:Title")
-        except Exception as e:
-            print(f"load_from_exiftool: {e}\n")
-
-        return img
-
-    @classmethod
     def load_batch_from_exiftool(cls, paths):
         exiftool_args = ["-G", "-j"] + ["-" + t for t in TAGS] + paths
         et = ExifTool()
@@ -120,8 +87,6 @@ class Image:
 
             images.append(image)
         return images
-
-
 
 
 def _as_list(value):

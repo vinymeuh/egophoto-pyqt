@@ -12,15 +12,15 @@ from PySide2.QtCore import (
 
 from egophoto.images_viewer.image import Image
 
-ATTRIBUTES_MAPPING = [
-    ("Fichier", lambda x: os.path.basename(x.path)),
-    ("Titre", lambda x: x.title),
-    ("Evenement", lambda x: x.event),
-    ("Tag(s)", lambda x: x.tags),
-    ("Personne(s)", lambda x: x.persons),
-    ("Type(s)", lambda x: x.categories),
-    ("Ville", lambda x: x.city),
-    ("Pays", lambda x: x.country),
+HEADERS = [
+    "Fichier",
+    "Titre",
+    "Evenement",
+    "Tag(s)",
+    "Personne(s)",
+    "Type(s)",
+    "Ville",
+    "Pays",
 ]
 
 
@@ -31,7 +31,7 @@ class ImagesDataModel(QAbstractItemModel):
         self.images = []
 
     def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
-        return len(ATTRIBUTES_MAPPING)
+        return len(HEADERS)
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         return len(self.images)
@@ -48,7 +48,7 @@ class ImagesDataModel(QAbstractItemModel):
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole) -> Any:
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return ATTRIBUTES_MAPPING[section][0]
+            return HEADERS[section]
         return super().headerData(section, orientation, role)
 
     def data(self, index: QModelIndex, role: int = Qt.DisplayRole) -> Any:
@@ -56,8 +56,22 @@ class ImagesDataModel(QAbstractItemModel):
         column = index.column()
         image = self.images[row]
         if role == Qt.DisplayRole:
-            f = ATTRIBUTES_MAPPING[column][1]
-            return f(image)
+            if column == 0:
+                return os.path.basename(image.path)
+            if column == 1:
+                return image.title
+            if column == 2:
+                return image.event
+            if column == 3:
+                return " ".join(image.tags)
+            if column == 4:
+                return " ".join(image.persons)
+            if column == 5:
+                return " ".join(image.categories)
+            if column == 6:
+                return image.city
+            if column == 7:
+                return image.country
 
     def setImages(self, paths: List[str]):
         self.beginResetModel()
