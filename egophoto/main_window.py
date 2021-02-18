@@ -24,7 +24,6 @@ import egophoto.import_images
 import egophoto.images_selector
 import egophoto.settings
 import egophoto.ui
-import egophoto.widgets
 
 from egophoto.images_viewer import ImagesViewer
 
@@ -38,7 +37,6 @@ class MainWindow(QMainWindow):
         self.images: List[str] = []
         self.imagesSelector = egophoto.images_selector.ImagesSelector(self.settings.directory_jpeg)
         self.imagesViewer = ImagesViewer()
-        self.imagesGrid = egophoto.widgets.ImagesGrid()  # TODO: remove
 
         # set window size
         app = QApplication.instance()
@@ -55,7 +53,6 @@ class MainWindow(QMainWindow):
 
         # signals
         self.imagesSelector.imageListUpdated.connect(self.displayImages)
-        self.imagesGrid.customContextMenuRequested.connect(self.showImageContextMenu)
 
     def closeEvent(self, event):
         pass
@@ -123,11 +120,9 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F1:
-            egophoto.ui.PhotoInformationListWindow(self.images).exec_()
-        if event.key() == Qt.Key_F2:
             self.viewGridAction.setChecked(True)
             self.imagesViewer.displayGridView()
-        if event.key() == Qt.Key_F3:
+        if event.key() == Qt.Key_F2:
             self.viewListAction.setChecked(True)
             self.imagesViewer.displayListView()
 
@@ -138,9 +133,6 @@ class MainWindow(QMainWindow):
 
     def showImageContextMenu(self, point: QPoint):
         menu = QMenu(self)
-
-        menu.addAction("Informations", partial(self.showInformations))
-        menu.addSeparator()
 
         xmp_location = menu.addMenu("Lieu")
         xmp_location.addAction("Editer", partial(self.editXMPLocation))
@@ -154,8 +146,3 @@ class MainWindow(QMainWindow):
         xmp_type.addAction("Editer")
 
         menu.exec_(self.imagesGrid.mapToGlobal(point))
-
-    def showInformations(self):
-        print(self.imagesGrid.selected)
-        egophoto.ui.PhotoInformationWindow(self.imagesGrid.selected[0]).exec_()  # TODO
-
